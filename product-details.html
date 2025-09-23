@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fawaz Fragrence</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    :root{
+      --bg:#fff; --text:#111; --muted:#6b6b6b; --gold:#b99056; --accent:#0b0b0b;
+      --beige:#f5efe8; --card-shadow:0 8px 24px rgba(12,12,12,0.12);
+    }
+    
+    body { font-family: Arial, sans-serif; margin: 0; background: var(--beige); color: var(--text); }
+
+    header { background: #222; color: #fff; padding: 15px; }
+    header nav a { color: #fff; margin-right: 15px; text-decoration: none; }
+
+    .container { max-width: 1100px; margin: 30px auto; padding: 20px; display: flex; flex-wrap: wrap; gap: 40px; }
+
+    .product-image { flex: 1 1 400px; }
+    .product-image img { width: 100%; border-radius: 10px; box-shadow: var(--card-shadow); }
+
+    .product-info { flex: 1 1 500px; }
+    .product-info h1 { margin: 0 0 15px; font-size: 2rem; color: var(--accent); }
+    .product-price { font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; color: var(--accent); }
+    .product-desc { font-size: 1rem; color: #444; margin-bottom: 20px; }
+
+    /* New product details */
+    .product-details { margin-bottom: 20px; }
+    .product-category { display: inline-block; background: var(--gold); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-bottom: 10px; font-weight: 600; }
+    .volume-selector { margin-bottom: 15px; }
+    .volume-selector label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--accent); }
+    .volume-options { display: flex; gap: 8px; flex-wrap: wrap; }
+    .volume-option { padding: 8px 16px; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; transition: 0.3s; background: #fff; }
+    .volume-option:hover { border-color: var(--gold); }
+    .volume-option.selected { border-color: var(--gold); background: var(--beige); color: var(--accent); }
+    .detailed-desc { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--gold); box-shadow: var(--card-shadow); }
+    .detailed-desc h3 { margin: 0 0 8px; font-size: 1.1rem; color: var(--accent); }
+    .detailed-desc p { margin: 0; line-height: 1.5; color: #555; }
+
+    .actions { display: flex; align-items: center; gap: 15px; }
+    .quantity-box { display: flex; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; background: #fff; }
+    .quantity-box button { background: #f5f5f5; border: none; padding: 8px 14px; cursor: pointer; font-size: 1.2rem; }
+    .quantity-box input { width: 50px; text-align: center; border: none; font-size: 1rem; }
+    .add-to-cart-btn { background: var(--gold); color: #fff; padding: 10px 22px; border: none; border-radius: 25px; cursor: pointer; transition: 0.3s; font-weight: 700; }
+    .add-to-cart-btn:hover { background: #a67c44; }
+
+    /* Cart Panel */
+    .cart-btn{position:fixed;right:16px;bottom:16px;background:var(--gold);border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;box-shadow:var(--card-shadow);cursor:pointer;z-index:200}
+    .cart-count{position:absolute;top:6px;right:6px;background:#111;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px}
+    .cart-panel{position:fixed;right:0;top:0;height:100vh;width:400px;max-width:100%;background:#fff;box-shadow:-20px 0 40px rgba(0,0,0,0.08);transform:translateX(100%);transition:transform .3s;padding:20px;z-index:200;display:flex;flex-direction:column;overflow-y:auto}
+    .cart-panel.open{transform:translateX(0)}
+    .cart-item{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:6px;background:#f5f5f5;border-radius:6px}
+    .qty-controls{display:flex;gap:4px;align-items:center}
+    .qty-controls button{padding:2px 6px;border-radius:4px;border:0;background:#ccc;cursor:pointer}
+    .cart-total{margin-top:12px;font-weight:700}
+    .close-cart{position:absolute;top:10px;right:10px;cursor:pointer;font-size:24px}
+
+    /* Custom Alert Modal */
+    .alert-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .alert-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .alert-modal {
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: var(--card-shadow);
+      transform: scale(0.7);
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+
+    .alert-overlay.show .alert-modal {
+      transform: scale(1);
+    }
+
+    .alert-icon {
+      width: 60px;
+      height: 60px;
+      background: var(--gold);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .alert-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 10px;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .alert-message {
+      color: var(--muted);
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .alert-product-info {
+      background: var(--beige);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--gold);
+    }
+
+    .alert-product-name {
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
+
+    .alert-product-details {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .alert-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .alert-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .alert-btn-primary {
+      background: var(--gold);
+      color: #fff;
+    }
+
+    .alert-btn-primary:hover {
+      background: #a67c44;
+      transform: translateY(-1px);
+    }
+
+    .alert-btn-secondary {
+      background: #f0f0f0;
+      color: var(--accent);
+    }
+
+    .alert-btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    /* Reviews */
+    .reviews { max-width: 1100px; margin: 0 auto 40px; padding: 0 20px; }
+    .reviews h2 { margin: 10px 0 12px; font-size: 1.4rem; color: var(--accent); }
+    .rating-summary { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+    .stars { color:#f5a623; font-size:18px; letter-spacing:1px; }
+    .review-list { display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+    .review-item { border:1px solid #eee; border-radius:10px; padding:12px 14px; background:#fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .review-item .meta { display:flex; align-items:center; gap:10px; font-size:.9rem; color:#555; margin-bottom:6px; }
+    .review-item .meta .stars { font-size:16px; }
+    .review-item p { margin:0; color:#333; line-height:1.45; }
+
+    footer { text-align: center; padding: 20px; margin-top: 40px; background: #111; color: #eee; }
+
+    @media (max-width: 600px) {
+      .volume-options { flex-direction: column; }
+      .volume-option { text-align: center; }
+      .alert-modal { padding: 20px; }
+      .alert-actions { flex-direction: column; }
+      .alert-btn { width: 100%; }
+      .cart-panel{width:100%}
+    }
+
+    /* Footer Styles */
+.main-footer {
+  background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+  color: #fff;
+  margin-top: 60px;
+  font-family: Lato, Arial, sans-serif;
+}
+
+.footer-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 50px 16px 30px;
+}
+
+/* Newsletter Section */
+.footer-newsletter {
+  text-align: center;
+  margin-bottom: 50px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-newsletter h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  margin-bottom: 12px;
+  color: var(--gold);
+}
+
+.footer-newsletter p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 25px;
+  font-size: 16px;
+}
+
+.newsletter-form {
+  display: flex;
+  max-width: 400px;
+  margin: 0 auto;
+  gap: 0;
+}
+
+.newsletter-input {
+  flex: 1;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 8px 0 0 8px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--accent);
+}
+
+.newsletter-input::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.newsletter-btn {
+  padding: 14px 24px;
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.newsletter-btn:hover {
+  background: #a67c44;
+}
+
+/* Footer Links */
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+}
+
+.footer-column h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: var(--gold);
+}
+
+.footer-column ul {
+  list-style: none;
+}
+
+.footer-column ul li {
+  margin-bottom: 12px;
+}
+
+.footer-column ul li a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.3s;
+  font-size: 15px;
+}
+
+.footer-column ul li a:hover {
+  color: var(--gold);
+}
+
+/* Social Links */
+.social-links {
+  margin-bottom: 25px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  margin-bottom: 10px;
+  transition: color 0.3s;
+  font-size: 15px;
+}
+
+.social-link:hover {
+  color: var(--gold);
+}
+
+.social-link span {
+  font-size: 18px;
+  width: 24px;
+}
+
+/* Contact Info */
+.contact-info p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.contact-info p:first-child {
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.footer-bottom-content {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 25px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer-legal {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.legal-links {
+  display: flex;
+  gap: 20px;
+}
+
+.legal-links a {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.legal-links a:hover {
+  color: var(--gold);
+}
+
+.footer-badges {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  background: rgba(185, 144, 86, 0.2);
+  color: var(--gold);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba(185, 144, 86, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer-content {
+    padding: 40px 16px 20px;
+  }
+  
+  .footer-newsletter h3 {
+    font-size: 24px;
+  }
+  
+  .newsletter-form {
+    flex-direction: column;
+    max-width: 300px;
+  }
+  
+  .newsletter-input {
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .newsletter-btn {
+    border-radius: 8px;
+  }
+  
+  .footer-links {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .footer-bottom-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .footer-legal {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .footer-badges {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-badges {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .legal-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="cart.html">Cart</a>
+    </nav>
+  </header>
+
+  <!-- Product Details -->
+  <div class="container">
+    <div class="product-image">
+      <img id="productImg" src="" alt="Product Image"/>
+    </div>
+    <div class="product-info">
+      <div class="product-category" id="productCategory">Luxury Collection</div>
+      <h1 id="productName"></h1>
+      <div class="product-price" id="productPrice"></div>
+      <p class="product-desc" id="productDesc"></p>
+
+      <div class="product-details">
+        <div class="volume-selector">
+          <label for="volumeOptions">Select Volume:</label>
+          <div class="volume-options" id="volumeOptions">
+            <div class="volume-option selected" data-volume="50ml" data-price="0">50ml - ₹<span class="vol-price">0</span></div>
+            <div class="volume-option" data-volume="100ml" data-price="50">100ml - ₹<span class="vol-price">0</span></div>
+            <div class="volume-option" data-volume="200ml" data-price="120">200ml - ₹<span class="vol-price">0</span></div>
+          </div>
+        </div>
+
+        <div class="detailed-desc">
+          <h3>Product Details</h3>
+          <p id="detailedDescription">
+            This exquisite fragrance opens with vibrant top notes that captivate the senses, 
+            transitioning into a sophisticated heart that embodies elegance and charm. 
+            The base notes provide lasting depth and warmth, creating a memorable signature scent 
+            that's perfect for both day and evening wear. Crafted with premium ingredients 
+            for exceptional longevity and projection.
+          </p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <div class="quantity-box">
+          <button onclick="changeQty(-1)">-</button>
+          <input type="text" id="quantity" value="1" readonly />
+          <button onclick="changeQty(1)">+</button>
+        </div>
+        <button class="add-to-cart-btn" onclick="addToCart()">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews -->
+  <section class="reviews">
+    <h2>Customer Reviews</h2>
+    <div class="rating-summary">
+      <div id="avgStars" class="stars" aria-label="Average rating">★★★★★</div>
+      <div id="avgText">4.8 out of 5 · 0 reviews</div>
+    </div>
+    <div id="reviewList" class="review-list"></div>
+  </section>
+
+  <!-- Cart Button & Panel -->
+  <div class="cart-btn" id="cartBtn">🛒<div class="cart-count" id="cartCount">0</div></div>
+
+  <div class="cart-panel" id="cartPanel" aria-hidden="true">
+    <span class="close-cart" id="closeCart">&times;</span>
+    <h3>Your Cart</h3>
+    <div id="cartItems"></div>
+    <div class="cart-total" id="cartTotal">Total: ₹0</div>
+  </div>
+
+  <!-- Custom Alert Modal -->
+  <div id="alertOverlay" class="alert-overlay">
+    <div class="alert-modal">
+      <div class="alert-icon">🛒</div>
+      <div class="alert-title">Added to Cart!</div>
+      <div class="alert-message">Your item has been successfully added to your cart.</div>
+      <div class="alert-product-info">
+        <div class="alert-product-name" id="alertProductName"></div>
+        <div class="alert-product-details" id="alertProductDetails"></div>
+      </div>
+      <div class="alert-actions">
+        <button class="alert-btn alert-btn-secondary" onclick="closeAlert()">Continue Shopping</button>
+        <button class="alert-btn alert-btn-primary" onclick="goToCart()">View Cart</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+<footer class="main-footer">
+  <div class="footer-content">
+    <!-- Newsletter Section -->
+    <div class="footer-newsletter">
+      <h3>Stay In The Loop</h3>
+      <p>Subscribe to get special offers, exclusive launches, and fragrance tips.</p>
+      <div class="newsletter-form">
+        <input type="email" placeholder="Enter your email" class="newsletter-input">
+        <button class="newsletter-btn">Subscribe</button>
+      </div>
+    </div>
+
+    <!-- Footer Links -->
+    <div class="footer-links">
+      <div class="footer-column">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="products.html">All Perfumes</a></li>
+          <li><a href="products.html?category=Classic">Classic Collection</a></li>
+          <li><a href="products.html?category=Luxury">Luxury Collection</a></li>
+          <li><a href="products.html?category=Modern">Modern Collection</a></li>
+          <li><a href="#bestsellers">Best Sellers</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Customer Care</h4>
+        <ul>
+          <li><a href="#contact">Contact Us</a></li>
+          <li><a href="#shipping">Shipping Info</a></li>
+          <li><a href="#returns">Returns & Exchanges</a></li>
+          <li><a href="#size-guide">Fragrance Guide</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="about.html">About Al-Abwa</a></li>
+          <li><a href="#careers">Careers</a></li>
+          <li><a href="#sustainability">Sustainability</a></li>
+          <li><a href="#press">Press</a></li>
+          <li><a href="#wholesale">Wholesale</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Connect</h4>
+        <div class="social-links">
+          <a href="#" class="social-link"><span>📘</span> Facebook</a>
+          <a href="#" class="social-link"><span>📷</span> Instagram</a>
+          <a href="#" class="social-link"><span>🐦</span> Twitter</a>
+          <a href="#" class="social-link"><span>📌</span> Pinterest</a>
+          <a href="#" class="social-link"><span>📱</span> TikTok</a>
+        </div>
+        <div class="contact-info">
+          <p><strong>Customer Service</strong></p>
+          <p>📞 +91 99675 89330</p>
+          <p>✉️ hello@alabwaperfumes.com</p>
+          <p>🕒 Mon-Fri: 9AM-6PM IST</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Bottom -->
+  <div class="footer-bottom">
+    <div class="footer-bottom-content">
+      <div class="footer-legal">
+        <p>&copy; 2025 Al-Abwa Perfumes. All rights reserved.</p>
+        <div class="legal-links">
+          <a href="#privacy">Privacy Policy</a>
+          <a href="#terms">Terms of Service</a>
+          <a href="#accessibility">Accessibility</a>
+        </div>
+      </div>
+      <div class="footer-badges">
+        <div class="badge">🔒 Secure Shopping</div>
+        <div class="badge">🚚 Free Shipping ₹999+</div>
+        <div class="badge">↩️ Easy Returns</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  // Existing: product details + cart
+  const CART_KEY = 'alabwa_cart_v1';
+  const urlParams = new URLSearchParams(window.location.search);
+  const name = urlParams.get('name') ? decodeURIComponent(urlParams.get('name')) : '';
+  const priceParam = urlParams.get('price') ? decodeURIComponent(urlParams.get('price')) : '';
+  const img = urlParams.get('img') ? decodeURIComponent(urlParams.get('img')) : '';
+  const desc = urlParams.get('desc') ? decodeURIComponent(urlParams.get('desc')) : '';
+  const cleanPrice = (txt) => parseInt(String(txt || '').replace(/[^\d]/g,''),10) || 0;
+  
+  let basePrice = 0;
+  let selectedVolume = '50ml';
+  let cart = [];
+
+  // Load cart from localStorage
+  function loadCart() {
+    try { 
+      cart = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); 
+    } catch(e) { 
+      cart = []; 
+    }
+    renderCart();
+  }
+
+  function saveCart() {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  }
+
+  function renderCart() {
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartTotalEl = document.getElementById('cartTotal');
+    const cartCountEl = document.getElementById('cartCount');
+
+    if (!cartItemsEl) return;
+
+    cartItemsEl.innerHTML = '';
+    let total = 0;
+
+    cart.forEach((item, idx) => {
+      total += item.price * item.qty;
+      const row = document.createElement('div');
+      row.className = 'cart-item';
+
+      const img = document.createElement('img');
+      img.src = item.image || '';
+      img.alt = item.name || '';
+      img.style.width = '50px';
+      img.style.height = '50px';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '6px';
+
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = item.name;
+      nameSpan.style.flex = '1';
+
+      const qtyDiv = document.createElement('div');
+      qtyDiv.className = 'qty-controls';
+      
+      const dec = document.createElement('button');
+      dec.type = 'button';
+      dec.textContent = '-';
+      dec.addEventListener('click', () => changeCartQty(idx, -1));
+
+      const qtyNum = document.createElement('span');
+      qtyNum.textContent = item.qty;
+      qtyNum.style.margin = '0 8px';
+
+      const inc = document.createElement('button');
+      inc.type = 'button';
+      inc.textContent = '+';
+      inc.addEventListener('click', () => changeCartQty(idx, +1));
+
+      qtyDiv.append(dec, qtyNum, inc);
+
+      const priceSpan = document.createElement('span');
+      priceSpan.textContent = `₹${item.price * item.qty}`;
+
+      row.append(img, nameSpan, qtyDiv, priceSpan);
+      cartItemsEl.appendChild(row);
+    });
+
+    if (cartTotalEl) cartTotalEl.textContent = `Total: ₹${total}`;
+    if (cartCountEl) cartCountEl.textContent = cart.reduce((s,i)=>s+i.qty,0);
+
+    saveCart();
+  }
+
+  function changeCartQty(idx, delta) {
+    if (!cart[idx]) return;
+    cart[idx].qty += delta;
+    if (cart[idx].qty <= 0) cart.splice(idx,1);
+    renderCart();
+  }
+
+  // Categories mapping
+  const categoryMap = {
+    'Amber Noir': 'Classic Collection',
+    'Royal Oud': 'Luxury Collection', 
+    'Velour Rose': 'Floral Collection',
+    'Ocean Mist': 'Fresh Collection',
+    'Golden Sandal': 'Woody Collection',
+    'Fresh Citrus': 'Citrus Collection'
+  };
+
+  if (name && priceParam && img) {
+    basePrice = cleanPrice(priceParam);
+    document.getElementById('productName').textContent = name;
+    document.getElementById('productPrice').textContent = '₹' + basePrice;
+    document.getElementById('productDesc').textContent = desc || '';
+    document.getElementById('productImg').src = img;
+    document.getElementById('productImg').alt = name;
+    
+    // Set category
+    const category = categoryMap[name] || 'Premium Collection';
+    document.getElementById('productCategory').textContent = category;
+    
+    // Update volume prices
+    updateVolumePrices();
+  }
+
+  function updateVolumePrices() {
+    const volumeOptions = document.querySelectorAll('.volume-option');
+    volumeOptions.forEach(option => {
+      const extraPrice = parseInt(option.dataset.price);
+      const totalPrice = basePrice + extraPrice;
+      option.querySelector('.vol-price').textContent = totalPrice;
+    });
+  }
+
+  // Volume selection
+  document.addEventListener('click', function(e) {
+    const volumeOption = e.target.closest('.volume-option');
+    if (volumeOption) {
+      // Remove selected class from all options
+      document.querySelectorAll('.volume-option').forEach(opt => opt.classList.remove('selected'));
+      // Add selected class to clicked option
+      volumeOption.classList.add('selected');
+      selectedVolume = volumeOption.dataset.volume;
+      
+      // Update main price
+      const extraPrice = parseInt(volumeOption.dataset.price);
+      const newPrice = basePrice + extraPrice;
+      document.getElementById('productPrice').textContent = '₹' + newPrice;
+    }
+  });
+
+  function changeQty(delta) {
+    const qtyEl = document.getElementById('quantity');
+    let val = parseInt(qtyEl.value,10) || 1;
+    val = Math.max(1, val + delta);
+    qtyEl.value = val;
+  }
+
+  // Cart Panel Functions
+  function openCartPanel() {
+    const cartPanel = document.getElementById('cartPanel');
+    if (cartPanel) {
+      cartPanel.classList.add('open');
+      cartPanel.setAttribute('aria-hidden','false');
+    }
+  }
+
+  function closeCartPanel() {
+    const cartPanel = document.getElementById('cartPanel');
+    if (cartPanel) {
+      cartPanel.classList.remove('open');
+      cartPanel.setAttribute('aria-hidden','true');
+    }
+  }
+
+  // Custom Alert Functions
+  function showAlert(productName, quantity, volume, price) {
+    const overlay = document.getElementById('alertOverlay');
+    const alertProductName = document.getElementById('alertProductName');
+    const alertProductDetails = document.getElementById('alertProductDetails');
+    
+    alertProductName.textContent = productName;
+    alertProductDetails.textContent = `Quantity: ${quantity} • Volume: ${volume} • Price: ₹${price}`;
+    
+    overlay.classList.add('show');
+    
+    // Auto close after 5 seconds
+    setTimeout(() => {
+      if (overlay.classList.contains('show')) {
+        closeAlert();
+      }
+    }, 5000);
+  }
+
+  function closeAlert() {
+    const overlay = document.getElementById('alertOverlay');
+    overlay.classList.remove('show');
+  }
+
+  function goToCart() {
+    closeAlert();
+    // Navigate to products page and open cart
+    window.location.href = 'products.html?openCart=true';
+  }
+
+  // Close modal when clicking outside
+  document.getElementById('alertOverlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeAlert();
+    }
+  });
+
+  // Cart button click
+  document.getElementById('cartBtn').addEventListener('click', openCartPanel);
+  document.getElementById('closeCart').addEventListener('click', closeCartPanel);
+
+  // Close cart when clicking outside
+  document.addEventListener('click', function(e){
+    const cartPanel = document.getElementById('cartPanel');
+    if (!cartPanel || !cartPanel.classList.contains('open')) return;
+    
+    const clickedInside = cartPanel.contains(e.target) || 
+                         document.getElementById('cartBtn').contains(e.target);
+    
+    if (!clickedInside) {
+      closeCartPanel();
+    }
+  });
+
+  function addToCart() {
+    const qty = parseInt(document.getElementById('quantity').value,10) || 1;
+    const selectedOption = document.querySelector('.volume-option.selected');
+    const extraPrice = parseInt(selectedOption.dataset.price);
+    const finalPrice = basePrice + extraPrice;
+    
+    const item = { 
+      name: name + ' (' + selectedVolume + ')', 
+      price: finalPrice, 
+      image: img, 
+      qty: qty 
+    };
+    
+    const existing = cart.find(p => p.name === item.name);
+    if (existing) existing.qty += qty;
+    else cart.push(item);
+    
+    renderCart();
+    
+    // Show custom alert
+    showAlert(item.name, qty, selectedVolume, finalPrice);
+  }
+
+  // Load cart on page load
+  loadCart();
+
+  // Fake reviews (4 or 5 stars only)
+  const reviewNames = ['Ayesha','Rahul','Zara','Imran','Kavya','Omar','Riya','Arjun','Noor','Meera'];
+  const reviewTexts = [
+    'Smells luxurious and lasts long. Great purchase!',
+    'Warm opening with a smooth dry-down. Perfect for evenings.',
+    'Fresh yet deep. Got compliments all day.',
+    'Elegant scent, not overpowering. Will buy again.',
+    'Excellent projection and longevity at this price.',
+    'Balanced and refined. Signature scent material.',
+    'Rich and comforting without being heavy.',
+    'Modern, clean, and very wearable.',
+    'Premium vibe and solid performance.',
+    'Sophisticated blend that stands out.'
+  ];
+
+  function randomInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+  function makeFakeReviews(count){
+    const arr = [];
+    for(let i=0;i<count;i++){
+      const n = reviewNames[randomInt(0, reviewNames.length-1)];
+      const t = reviewTexts[randomInt(0, reviewTexts.length-1)];
+      const rating = randomInt(4,5); // only 4 or 5
+      const daysAgo = randomInt(1, 45);
+      const date = Date.now() - daysAgo*24*60*60*1000;
+      arr.push({ name:n, rating, text:t, date });
+    }
+    return arr;
+  }
+
+  function renderStars(n){
+    const full = Math.round(n);
+    return '★★★★★'.slice(0, full) + '☆☆☆☆☆'.slice(0, 5 - full);
+  }
+
+  function fmtDate(ts){
+    try { return new Date(ts).toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'}); }
+    catch { return ''; }
+  }
+
+  function renderReviews(revs){
+    const list = document.getElementById('reviewList');
+    const avgStars = document.getElementById('avgStars');
+    const avgText = document.getElementById('avgText');
+
+    list.innerHTML = '';
+    revs.slice().sort((a,b)=> (b.date||0)-(a.date||0)).forEach(r=>{
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.innerHTML = `
+        <div class="meta">
+          <span class="stars" aria-hidden="true">${renderStars(r.rating||0)}</span>
+          <strong>${r.name||'Anonymous'}</strong>
+          <span style="margin-left:auto;color:#777;font-size:.85rem;">${fmtDate(r.date)}</span>
+        </div>
+        <p>${(r.text||'').replace(/</g,'&lt;')}</p>
+      `;
+      list.appendChild(div);
+    });
+
+    const avg = revs.length ? (revs.reduce((s,r)=> s + (r.rating||0),0)/revs.length) : 0;
+    avgStars.textContent = renderStars(avg);
+    avgText.textContent = `${avg.toFixed(1)} out of 5 · ${revs.length} review${revs.length===1?'':'s'}`;
+  }
+
+  // Generate 5–8 fake reviews and render
+  const fakeCount = randomInt(5,8);
+  const fakeReviews = makeFakeReviews(fakeCount);
+  renderReviews(fakeReviews);
+</script>
+
+</body>
+</html>
