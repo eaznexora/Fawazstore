@@ -805,15 +805,6 @@
       <input type="text" id="customerStreet" placeholder="Street Address" required/>
       <input type="text" id="customerCity" placeholder="City" required/>
       <input type="text" id="customerState" placeholder="State" required/>
-      <input type="text" id="customerZIP" placeholder="ZIP/Postal Code" required/>
-      <input type="text" id="customerCountry" placeholder="Country" required/>
-      <label for="shippingOption">Shipping Options:</label>
-      <select id="shippingOption">
-        <option value="Standard">Standard</option>
-        <option value="Express">Express</option>
-        <option value="Same-Day">Same-Day</option>
-      </select>
-      <div id="deliveryEstimate" style="margin-top:6px;color:var(--muted);">Estimated Delivery: 3-7 days</div>
       <button class="pay-btn" id="confirmPayBtn">Confirm & Pay</button>
       <button class="pay-btn" id="backBtn" style="background:#ccc;color:#111;margin-top:6px;">Back</button>
     </div>
@@ -875,9 +866,9 @@
         <div class="social-links">
           <a href="#" class="social-link"><span>📘</span> Facebook</a>
           <a href="#" class="social-link"><span>📷</span> Instagram</a>
-          <a href="#" class="social-link"><span>🐦</span> Twitter</a>
+     <!-- <a href="#" class="social-link"><span>🐦</span> Twitter</a>
           <a href="#" class="social-link"><span>📌</span> Pinterest</a>
-          <a href="#" class="social-link"><span>📱</span> TikTok</a>
+          <a href="#" class="social-link"><span>📱</span> TikTok</a> -->
         </div>
         <div class="contact-info">
           <p><strong>Customer Service</strong></p>
@@ -911,6 +902,30 @@
 
 
 <script>
+function handleStickyCheckoutVisibility() {
+  const stickyCheckout = document.getElementById('stickyCheckout');
+  const cartPanel = document.getElementById('cartPanel');
+  const footer = document.querySelector('footer');
+  if (!stickyCheckout || !footer) return;
+
+  const cartOpen = cartPanel && cartPanel.classList.contains('open');
+  const footerRect = footer.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+
+  // Hide if cart open or footer visible, else show if cart has items
+  if (
+    cartOpen ||
+    (footerRect.top < windowHeight && footerRect.bottom > 0)
+  ) {
+    stickyCheckout.style.display = 'none';
+  } else if (cart && cart.length > 0) {
+    stickyCheckout.style.display = 'block';
+  } else {
+    stickyCheckout.style.display = 'none';
+  }
+}
+
+
 function goToDetails(imgElement) {
     const parent = imgElement.closest(".product");
     const name = parent.getAttribute("data-name");
@@ -1132,32 +1147,38 @@ function goToDetails(imgElement) {
   });
 
   // confirm & pay -> build WhatsApp message
-  const confirmPayBtn = qs('#confirmPayBtn');
-  if (confirmPayBtn){
-    confirmPayBtn.addEventListener('click', function(){
-      const name = (qs('#customerName')||{}).value || '';
-      const phone = (qs('#customerPhone')||{}).value || '';
-      const email = (qs('#customerEmail')||{}).value || '';
-      const street = (qs('#customerStreet')||{}).value || '';
-      const city = (qs('#customerCity')||{}).value || '';
-      const state = (qs('#customerState')||{}).value || '';
-      const zip = (qs('#customerZIP')||{}).value || '';
-      const country = (qs('#customerCountry')||{}).value || '';
-      const shipping = (qs('#shippingOption')||{}).value || '';
+ const confirmPayBtn = qs('#confirmPayBtn');
+if (confirmPayBtn) {
+  confirmPayBtn.addEventListener('click', function () {
+    const name = qs('#customerName').value || '';
+    const phone = qs('#customerPhone').value || '';
+    const email = qs('#customerEmail').value || '';
+    const street = qs('#customerStreet').value || '';
+    const city = qs('#customerCity').value || '';
+    const state = qs('#customerState').value || '';
 
-      if (!name || !phone || !email || !street || !city || !state || !zip || !country){
-        alert('Fill all details!');
-        return;
-      }
-      if (!cart.length){ alert('Your cart is empty.'); return; }
+    if (!name || !phone || !email || !street || !city || !state) {
+      alert('Fill all details!');
+      return;
+    }
+    if (!cart.length) {
+      alert('Your cart is empty.');
+      return;
+    }
 
-      let msg = `Order for ${encodeURIComponent(name)}%0AContact: ${encodeURIComponent(phone)}, ${encodeURIComponent(email)}%0AAddress: ${encodeURIComponent(street)}, ${encodeURIComponent(city)}, ${encodeURIComponent(state)}, ${encodeURIComponent(zip)}, ${encodeURIComponent(country)}%0AShipping: ${encodeURIComponent(shipping)}%0A---%0A`;
-      cart.forEach(i => { msg += `${i.qty}x ${encodeURIComponent(i.name)} - ₹${i.price * i.qty}%0A`; });
-      const total = cart.reduce((s,i)=>s + (i.price * i.qty), 0);
-      msg += `Total: ₹${total}`;
-      window.open(`https://wa.me/9967589330?text=${msg}`, '_blank');
+    let msg = `Order for ${encodeURIComponent(name)}%0AContact: ${encodeURIComponent(phone)}, ${encodeURIComponent(email)}%0AAddress: ${encodeURIComponent(street)}, ${encodeURIComponent(city)}, ${encodeURIComponent(state)}%0A---%0A`;
+
+    cart.forEach((i) => {
+      msg += `${i.qty}x ${encodeURIComponent(i.name)} - ₹${i.price * i.qty}%0A`;
     });
-  }
+
+    const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+    msg += `Total: ₹${total}`;
+
+    window.open(`https://wa.me/9967589330?text=${msg}`, '_blank');
+  });
+}
+
 
   // shipping estimate update
   const shippingOption = qs('#shippingOption');
@@ -1210,6 +1231,9 @@ function goToDetails(imgElement) {
   };
 
 })();
+
+window.addEventListener('scroll', handleStickyCheckoutVisibility);
+window.addEventListener('resize', handleStickyCheckoutVisibility);
 </script>
 
 </body>
