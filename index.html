@@ -269,6 +269,8 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
 /* Social Links */
 .social-links {
   margin-bottom: 25px;
+  align-content: center;
+  align-items: center;
 }
 
 .social-link {
@@ -577,27 +579,21 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
     <div class="cart-total" id="cartTotal">Total: ₹0</div>
     <button class="pay-btn" id="checkoutBtn">Checkout</button>
 
-    <!-- Checkout Form -->
-    <div class="cart-form" id="cartForm">
-      <h3>Checkout Details</h3>
-      <input type="text" id="customerName" placeholder="Full Name" required/>
-      <input type="tel" id="customerPhone" placeholder="Phone Number" required/>
-      <input type="email" id="customerEmail" placeholder="Email" required/>
-      <input type="text" id="customerStreet" placeholder="Street Address" required/>
-      <input type="text" id="customerCity" placeholder="City" required/>
-      <input type="text" id="customerState" placeholder="State" required/>
-      <input type="text" id="customerZIP" placeholder="ZIP/Postal Code" required/>
-      <input type="text" id="customerCountry" placeholder="Country" required/>
-      <label for="shippingOption">Shipping Options:</label>
-      <select id="shippingOption">
-        <option value="Standard">Standard</option>
-        <option value="Express">Express</option>
-        <option value="Same-Day">Same-Day</option>
-      </select>
-      <div id="deliveryEstimate" style="margin-top:6px;color:var(--muted);">Estimated Delivery: 3-7 days</div>
-      <button class="pay-btn" id="confirmPayBtn">Confirm & Pay</button>
-      <button class="pay-btn" id="backBtn" style="background:#ccc;color:#111;margin-top:6px;">Back</button>
-    </div>
+<!-- Checkout Form -->
+<div class="cart-form" id="cartForm">
+  <h3>Checkout Details</h3>
+  <input type="text" id="customerName" placeholder="Full Name" required/>
+  <input type="tel" id="customerPhone" placeholder="Phone Number" required/>
+  <input type="email" id="customerEmail" placeholder="Email" required/>
+  <input type="text" id="customerStreet" placeholder="Street Address" required/>
+  <input type="text" id="customerCity" placeholder="City" required/>
+  <input type="text" id="customerState" placeholder="State" required/>
+  <!-- Removed ZIP/Postal Code input -->
+  <!-- Removed Country input -->
+  <!-- Removed Shipping Options select and delivery estimate -->
+  <button class="pay-btn" id="confirmPayBtn">Confirm & Pay</button>
+  <button class="pay-btn" id="backBtn" style="background:#ccc;color:#111;margin-top:6px;">Back</button>
+</div>
   </div>
 
 <!-- Footer -->
@@ -653,12 +649,12 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
         <div class="social-links">
           <a href="#" class="social-link"><span>📘</span> Facebook</a>
           <a href="#" class="social-link"><span>📷</span> Instagram</a>
-          <a href="#" class="social-link"><span>🐦</span> Twitter</a>
+    <!-- <a href="#" class="social-link"><span>🐦</span> Twitter</a>
           <a href="#" class="social-link"><span>📌</span> Pinterest</a>
-          <a href="#" class="social-link"><span>📱</span> TikTok</a>
+          <a href="#" class="social-link"><span>📱</span> TikTok</a> -->
         </div>
         <div class="contact-info">
-          <p><strong>Customer Service</strong></p>
+          <h4>Customer Service</h4>
           <p>📞 +91 99675 89330</p>
           <p>✉️ hello@alabwaperfumes.com</p>
           <p>🕒 Mon-Fri: 9AM-6PM IST</p>
@@ -671,7 +667,7 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
   <div class="footer-bottom">
     <div class="footer-bottom-content">
       <div class="footer-legal">
-        <p>&copy; 2025 Fawaz Fragrence. All rights reserved. Crafted by Eaz Nexora</p>
+        <p><b>&copy; 2025 Fawaz Fragrence. All rights reserved. Crafted by Eaz Nexora</b></p>
         <div class="legal-links">
           <a href="#privacy">Privacy Policy</a>
           <a href="#terms">Terms of Service</a>
@@ -691,6 +687,30 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
 <button id="stickyCheckout" class="sticky-checkout">Checkout (₹0)</button>
 
 <script>
+
+function handleStickyCheckoutVisibility() {
+  const stickyCheckout = document.getElementById('stickyCheckout');
+  const cartPanel = document.getElementById('cartPanel');
+  const footer = document.querySelector('footer');
+  if (!stickyCheckout || !footer) return;
+
+  const cartOpen = cartPanel && cartPanel.classList.contains('open');
+  const footerRect = footer.getBoundingClientRect();
+  const windowHeight = window.innerHeight;
+
+  // Hide if cart open or footer visible, else show if cart has items
+  if (
+    cartOpen ||
+    (footerRect.top < windowHeight && footerRect.bottom > 0)
+  ) {
+    stickyCheckout.style.display = 'none';
+  } else if (cart && cart.length > 0) {
+    stickyCheckout.style.display = 'block';
+  } else {
+    stickyCheckout.style.display = 'none';
+  }
+}
+
 
 function goToDetails(img) {
   const productCard = img.closest('.product');
@@ -1021,6 +1041,10 @@ function goToDetails(img) {
     window.addEventListener('unload', () => cancelAnimationFrame(raf));
   }
 
+window.addEventListener('scroll', handleStickyCheckoutVisibility);
+window.addEventListener('resize', handleStickyCheckoutVisibility);
+
+
   // ========== EVENT HANDLERS ==========
   function initEventHandlers() {
     // Global click handler
@@ -1117,37 +1141,37 @@ function goToDetails(img) {
     }
   }
 
-  function handleWhatsAppCheckout() {
-    const name = (qs('#customerName')||{}).value || '';
-    const phone = (qs('#customerPhone')||{}).value || '';
-    const email = (qs('#customerEmail')||{}).value || '';
-    const street = (qs('#customerStreet')||{}).value || '';
-    const city = (qs('#customerCity')||{}).value || '';
-    const state = (qs('#customerState')||{}).value || '';
-    const zip = (qs('#customerZIP')||{}).value || '';
-    const country = (qs('#customerCountry')||{}).value || '';
-    const shipping = (qs('#shippingOption')||{}).value || '';
+function handleWhatsAppCheckout() {
+  const name = (qs('#customerName') || {}).value || '';
+  const phone = (qs('#customerPhone') || {}).value || '';
+  const email = (qs('#customerEmail') || {}).value || '';
+  const street = (qs('#customerStreet') || {}).value || '';
+  const city = (qs('#customerCity') || {}).value || '';
+  const state = (qs('#customerState') || {}).value || '';
 
-    if (!name || !phone || !email || !street || !city || !state || !zip || !country){
-      alert('Fill all details!');
-      return;
-    }
-    if (!cart.length){ 
-      alert('Your cart is empty.'); 
-      return; 
-    }
-
-    let msg = `Order for ${encodeURIComponent(name)}%0AContact: ${encodeURIComponent(phone)}, ${encodeURIComponent(email)}%0AAddress: ${encodeURIComponent(street)}, ${encodeURIComponent(city)}, ${encodeURIComponent(state)}, ${encodeURIComponent(zip)}, ${encodeURIComponent(country)}%0AShipping: ${encodeURIComponent(shipping)}%0A---%0A`;
-    
-    cart.forEach(i=> {
-      msg += `${i.qty}x ${encodeURIComponent(i.name)} - ₹${i.price*i.qty}%0A`;
-    });
-    
-    const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    msg += `Total: ₹${total}`;
-    
-    window.open(`https://wa.me/9967589330?text=${msg}`, '_blank');
+  // Validate required fields only for visible inputs
+  if (!name || !phone || !email || !street || !city || !state) {
+    alert('Fill all details!');
+    return;
   }
+
+  if (!cart.length) {
+    alert('Your cart is empty.');
+    return;
+  }
+
+  let msg = `Order for ${encodeURIComponent(name)}%0AContact: ${encodeURIComponent(phone)}, ${encodeURIComponent(email)}%0AAddress: ${encodeURIComponent(street)}, ${encodeURIComponent(city)}, ${encodeURIComponent(state)}%0A---%0A`;
+
+  cart.forEach(i => {
+    msg += `${i.qty}x ${encodeURIComponent(i.name)} - ₹${i.price * i.qty}%0A`;
+  });
+
+  const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  msg += `Total: ₹${total}`;
+
+  window.open(`https://wa.me/9967589330?text=${msg}`, '_blank');
+}
+
 
   // ========== SEARCH FUNCTIONALITY ==========
   function initSearchFunctionality() {
