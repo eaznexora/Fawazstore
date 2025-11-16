@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fawaz Fragrence</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root{
       --bg:#fff; --text:#111; --muted:#6b6b6b; --gold:#b99056; --accent:#0b0b0b;
@@ -331,6 +332,17 @@
   }
 }
 
+.social-link i {
+  width: 24px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.contact-info i {
+  width: 20px;
+  margin-right: 6px;
+  color: var(--gold);
+}
 
   </style>
 </head>
@@ -794,7 +806,7 @@
     <h3>Your Cart</h3>
     <div id="cartItems"></div>
     <div class="cart-total" id="cartTotal">Total: ₹0</div>
-    <button class="pay-btn" id="checkoutBtn">Pay with PhonePe</button>
+    <button class="pay-btn" id="checkoutBtn">checkout</button>
 
     <!-- Checkout Form (visible after clicking checkout) -->
     <div class="cart-form" id="cartForm">
@@ -805,7 +817,7 @@
       <input type="text" id="customerStreet" placeholder="Street Address" required/>
       <input type="text" id="customerCity" placeholder="City" required/>
       <input type="text" id="customerState" placeholder="State" required/>
-      <button class="pay-btn" id="confirmPayBtn">Confirm & Pay</button>
+      <button class="pay-btn" id="confirmPayBtn">Confirm & Pay via WhatsApp</button>
       <button class="pay-btn" id="backBtn" style="background:#ccc;color:#111;margin-top:6px;">Back</button>
     </div>
   </div>
@@ -839,7 +851,7 @@
         </ul>
       </div>
 
-      <div class="footer-column">
+      <!-- <div class="footer-column">
         <h4>Customer Care</h4>
         <ul>
           <li><a href="#contact">Contact Us</a></li>
@@ -848,7 +860,7 @@
           <li><a href="#size-guide">Fragrance Guide</a></li>
           <li><a href="#faq">FAQ</a></li>
         </ul>
-      </div>
+      </div> 
 
       <div class="footer-column">
         <h4>Company</h4>
@@ -859,23 +871,25 @@
           <li><a href="#press">Press</a></li>
           <li><a href="#wholesale">Wholesale</a></li>
         </ul>
-      </div>
+      </div> -->
 
       <div class="footer-column">
         <h4>Connect</h4>
         <div class="social-links">
-          <a href="#" class="social-link"><span>📘</span> Facebook</a>
-          <a href="#" class="social-link"><span>📷</span> Instagram</a>
-     <!-- <a href="#" class="social-link"><span>🐦</span> Twitter</a>
-          <a href="#" class="social-link"><span>📌</span> Pinterest</a>
-          <a href="#" class="social-link"><span>📱</span> TikTok</a> -->
-        </div>
+  <a href="#" class="social-link"><i class="fab fa-facebook-f"></i> Facebook</a>
+  <a href="#" class="social-link"><i class="fab fa-instagram"></i> Instagram</a>
+  <a href="#" class="social-link"><i class="fab fa-x-twitter"></i> Twitter</a>
+  <a href="#" class="social-link"><i class="fab fa-pinterest-p"></i> Pinterest</a>
+  <a href="#" class="social-link"><i class="fab fa-tiktok"></i> TikTok</a>
+</div>
+
         <div class="contact-info">
-          <p><strong>Customer Service</strong></p>
-          <p>📞 +91 99675 89330</p>
-          <p>✉️ hello@alabwaperfumes.com</p>
-          <p>🕒 Mon-Fri: 9AM-6PM IST</p>
-        </div>
+  <p><strong>Customer Service</strong></p>
+  <p><i class="fas fa-phone"></i> +91 99675 89330</p>
+  <p><i class="fas fa-envelope"></i> hello@alabwaperfumes.com</p>
+  <p><i class="fas fa-clock"></i> Mon–Fri: 9AM–6PM IST</p>
+</div>
+
       </div>
     </div>
   </div>
@@ -1069,13 +1083,16 @@ function goToDetails(imgElement) {
     cartCountEl.textContent = cart.reduce((s,i)=>s+i.qty,0);
 
     // sticky checkout update
-    if (cart.length > 0 && total > 0){
-      stickyCheckout.style.display = 'block';
-      stickyCheckout.textContent = `Checkout (₹${total})`;
-    } else {
-      stickyCheckout.style.display = 'none';
-      stickyCheckout.textContent = `Checkout (₹0)`;
-    }
+  if (stickyCheckout) {
+  if (cart.length > 0 && total > 0) {
+    stickyCheckout.style.display = 'block';
+    stickyCheckout.textContent = `Checkout (₹${total})`;
+  } else {
+    stickyCheckout.style.display = 'none';
+    stickyCheckout.textContent = `Checkout (₹0)`;
+  }
+}
+
 
     saveCart();
   }
@@ -1120,12 +1137,34 @@ function goToDetails(imgElement) {
   }, false);
 
   // cart open/close
-  if (cartBtn && cartPanel){
-    cartBtn.addEventListener('click', ()=>{ cartPanel.classList.add('open'); cartPanel.setAttribute('aria-hidden','false'); });
-  }
-  if (closeCart && cartPanel){
-    closeCart.addEventListener('click', ()=>{ cartPanel.classList.remove('open'); cartPanel.setAttribute('aria-hidden','true'); if (cartForm) cartForm.style.display='none'; });
-  }
+  if (cartBtn && cartPanel) {
+  cartBtn.addEventListener('click', () => {
+    cartPanel.classList.add('open');
+    cartPanel.setAttribute('aria-hidden', 'false');
+    if (cartForm) cartForm.style.display = 'none';
+
+    // 🔥 Instantly hide sticky checkout when cart opens
+    const stickyCheckout = document.getElementById('stickyCheckout');
+    if (stickyCheckout) stickyCheckout.style.display = 'none';
+  });
+}
+
+if (closeCart && cartPanel) {
+  closeCart.addEventListener('click', () => {
+    cartPanel.classList.remove('open');
+    cartPanel.setAttribute('aria-hidden', 'true');
+    if (cartForm) cartForm.style.display = 'none';
+
+    // 🔥 Instantly show sticky checkout again (if cart has items)
+    const stickyCheckout = document.getElementById('stickyCheckout');
+    if (stickyCheckout && cart.length > 0) {
+      stickyCheckout.style.display = 'block';
+    } else if (stickyCheckout) {
+      stickyCheckout.style.display = 'none';
+    }
+  });
+}
+
 
   if (checkoutBtn && cartForm){
     checkoutBtn.addEventListener('click', ()=> cartForm.style.display = 'flex');
