@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fawaz Fragrence</title>
+  <title>Fawaz Fragnance</title>
   <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root{
       --bg:#fff; --text:#111; --muted:#6b6b6b; --gold:#b99056; --accent:#0b0b0b;
@@ -46,15 +47,20 @@
     .add-to-cart-btn { background: var(--gold); color: #fff; padding: 10px 22px; border: none; border-radius: 25px; cursor: pointer; transition: 0.3s; font-weight: 700; }
     .add-to-cart-btn:hover { background: #a67c44; }
 
-    /* Cart Panel */
+    /* Cart */
     .cart-btn{position:fixed;right:16px;bottom:16px;background:var(--gold);border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;box-shadow:var(--card-shadow);cursor:pointer;z-index:200}
     .cart-count{position:absolute;top:6px;right:6px;background:#111;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px}
-    .cart-panel{position:fixed;right:0;top:0;height:100vh;width:400px;max-width:100%;background:#fff;box-shadow:-20px 0 40px rgba(0,0,0,0.08);transform:translateX(100%);transition:transform .3s;padding:20px;z-index:200;display:flex;flex-direction:column;overflow-y:auto}
+    .cart-panel{position:fixed;right:0;top:0;height:100vh;width:390px;max-width:100%;background:#fff;box-shadow:-20px 0 40px rgba(0,0,0,0.08);transform:translateX(100%);transition:transform .3s;padding:20px;z-index:200;display:flex;flex-direction:column;overflow-y:auto}
     .cart-panel.open{transform:translateX(0)}
     .cart-item{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:6px;background:#f5f5f5;border-radius:6px}
+    .cart-item img{width:50px;height:50px;object-fit:cover;border-radius:6px;margin-right:8px}
     .qty-controls{display:flex;gap:4px;align-items:center}
-    .qty-controls button{padding:2px 6px;border-radius:4px;border:0;background:#ccc;cursor:pointer}
+    .qty-controls button{padding:2px 6px;cursor:pointer;border-radius:4px;border:none;background:#ccc}
     .cart-total{margin-top:12px;font-weight:700}
+    .cart-form{display:none;flex-direction:column;gap:6px;margin-top:12px}
+    .cart-form input,.cart-form select{padding:8px;border-radius:6px;border:1px solid rgba(0,0,0,0.2)}
+    .pay-btn{margin-top:10px;padding:10px;border:none;border-radius:6px;background:var(--gold);color:#fff;cursor:pointer;font-weight:700}
+    .pay-btn:hover{background:#a67c44}
     .close-cart{position:absolute;top:10px;right:10px;cursor:pointer;font-size:24px}
 
     /* Custom Alert Modal */
@@ -454,18 +460,30 @@
   }
 }
 
+.social-link i {
+  width: 24px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.contact-info i {
+  width: 20px;
+  margin-right: 6px;
+  color: var(--gold);
+}
+
+/* FORCE the cart panel width to exactly 390px */
+#cartPanel.cart-panel {
+  width: 390px !important;
+  max-width: 390px !important;
+  min-width: 390px !important;
+  flex: 0 0 390px !important;
+  box-sizing: border-box !important;
+}
 
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <header>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="products.html">Products</a>
-      <a href="cart.html">Cart</a>
-    </nav>
-  </header>
 
   <!-- Product Details -->
   <div class="container">
@@ -525,11 +543,25 @@
   <div class="cart-btn" id="cartBtn">🛒<div class="cart-count" id="cartCount">0</div></div>
 
   <div class="cart-panel" id="cartPanel" aria-hidden="true">
-    <span class="close-cart" id="closeCart">&times;</span>
-    <h3>Your Cart</h3>
-    <div id="cartItems"></div>
-    <div class="cart-total" id="cartTotal">Total: ₹0</div>
+  <span class="close-cart" id="closeCart">&times;</span>
+  <h3>Your Cart</h3>
+  <div id="cartItems"></div>
+  <div class="cart-total" id="cartTotal">Total: ₹0</div>
+  <button class="pay-btn" id="checkoutBtn">Checkout</button>
+
+  <!-- Checkout Form -->
+  <div class="cart-form" id="cartForm">
+    <h3>Checkout Details</h3>
+    <input type="text" id="customerName" placeholder="Full Name" required />
+    <input type="tel" id="customerPhone" placeholder="Phone Number" required />
+    <input type="email" id="customerEmail" placeholder="Email" required />
+    <input type="text" id="customerStreet" placeholder="Street Address" required />
+    <input type="text" id="customerCity" placeholder="City" required />
+    <input type="text" id="customerState" placeholder="State" required />
+    <button class="pay-btn" id="confirmPayBtn">Confirm & Pay via WhatsApp</button>
+    <button class="pay-btn" id="backBtn" style="background:#ccc;color:#111;margin-top:6px;">Back</button>
   </div>
+</div>
 
   <!-- Custom Alert Modal -->
   <div id="alertOverlay" class="alert-overlay">
@@ -574,7 +606,7 @@
         </ul>
       </div>
 
-      <div class="footer-column">
+     <!-- <div class="footer-column">
         <h4>Customer Care</h4>
         <ul>
           <li><a href="#contact">Contact Us</a></li>
@@ -594,23 +626,25 @@
           <li><a href="#press">Press</a></li>
           <li><a href="#wholesale">Wholesale</a></li>
         </ul>
-      </div>
+      </div> -->
 
       <div class="footer-column">
         <h4>Connect</h4>
-        <div class="social-links">
-          <a href="#" class="social-link"><span>📘</span> Facebook</a>
-          <a href="#" class="social-link"><span>📷</span> Instagram</a>
-     <!-- <a href="#" class="social-link"><span>🐦</span> Twitter</a>
-          <a href="#" class="social-link"><span>📌</span> Pinterest</a>
-          <a href="#" class="social-link"><span>📱</span> TikTok</a> -->
-        </div>
-        <div class="contact-info">
-          <p><strong>Customer Service</strong></p>
-          <p>📞 +91 99675 89330</p>
-          <p>✉️ hello@alabwaperfumes.com</p>
-          <p>🕒 Mon-Fri: 9AM-6PM IST</p>
-        </div>
+       <div class="social-links">
+  <a href="#" class="social-link"><i class="fab fa-facebook-f"></i> Facebook</a>
+  <a href="#" class="social-link"><i class="fab fa-instagram"></i> Instagram</a>
+  <a href="#" class="social-link"><i class="fab fa-x-twitter"></i> Twitter</a>
+  <a href="#" class="social-link"><i class="fab fa-pinterest-p"></i> Pinterest</a>
+  <a href="#" class="social-link"><i class="fab fa-tiktok"></i> TikTok</a>
+</div>
+
+       <div class="contact-info">
+  <p><strong>Customer Service</strong></p>
+  <p><i class="fas fa-phone"></i> +91 99675 89330</p>
+  <p><i class="fas fa-envelope"></i> hello@alabwaperfumes.com</p>
+  <p><i class="fas fa-clock"></i> Mon–Fri: 9AM–6PM IST</p>
+</div>
+
       </div>
     </div>
   </div>
@@ -619,7 +653,7 @@
   <div class="footer-bottom">
     <div class="footer-bottom-content">
       <div class="footer-legal">
-        <p>&copy; 2025 Al-Abwa Perfumes. All rights reserved.</p>
+        <p>&copy; 2025 Fawaz Fragnance. All rights reserved. Crafted by Eaz Nexora</p>
         <div class="legal-links">
           <a href="#privacy">Privacy Policy</a>
           <a href="#terms">Terms of Service</a>
@@ -955,7 +989,48 @@
   const fakeCount = randomInt(5,8);
   const fakeReviews = makeFakeReviews(fakeCount);
   renderReviews(fakeReviews);
+
+  // === Checkout Logic ===
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  document.getElementById('cartForm').style.display = 'flex';
+});
+
+document.getElementById('backBtn').addEventListener('click', () => {
+  document.getElementById('cartForm').style.display = 'none';
+});
+
+document.getElementById('confirmPayBtn').addEventListener('click', () => {
+  const name = document.getElementById('customerName').value.trim();
+  const phone = document.getElementById('customerPhone').value.trim();
+  const email = document.getElementById('customerEmail').value.trim();
+  const street = document.getElementById('customerStreet').value.trim();
+  const city = document.getElementById('customerCity').value.trim();
+  const state = document.getElementById('customerState').value.trim();
+
+  if (!name || !phone || !email || !street || !city || !state) {
+    alert('Please fill in all details, King!');
+    return;
+  }
+
+  if (!cart.length) {
+    alert('Your cart is empty!');
+    return;
+  }
+
+  let msg = `Order from ${encodeURIComponent(name)}%0A📞 ${encodeURIComponent(phone)}%0A✉️ ${encodeURIComponent(email)}%0A🏠 ${encodeURIComponent(street)}, ${encodeURIComponent(city)}, ${encodeURIComponent(state)}%0A---%0A`;
+
+  cart.forEach(item => {
+    msg += `${item.qty}x ${encodeURIComponent(item.name)} - ₹${item.price * item.qty}%0A`;
+  });
+
+  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+  msg += `Total: ₹${total}`;
+
+  window.open(`https://wa.me/9967589330?text=${msg}`, '_blank');
+});
+
 </script>
 
 </body>
 </html>
+
