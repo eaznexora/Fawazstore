@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fawaz Fragrence | Where Elegance Meets Essence</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root{
   --bg:#fff; --text:#111; --muted:#6b6b6b; --gold:#b99056; --accent:#0b0b0b;
@@ -269,8 +270,6 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
 /* Social Links */
 .social-links {
   margin-bottom: 25px;
-  align-content: center;
-  align-items: center;
 }
 
 .social-link {
@@ -419,6 +418,17 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
   }
 }
 
+.social-link i {
+  width: 24px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.contact-info i {
+  width: 20px;
+  margin-right: 6px;
+  color: var(--gold);
+}
 
   </style>
 </head>
@@ -591,7 +601,7 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
   <!-- Removed ZIP/Postal Code input -->
   <!-- Removed Country input -->
   <!-- Removed Shipping Options select and delivery estimate -->
-  <button class="pay-btn" id="confirmPayBtn">Confirm & Pay</button>
+  <button class="pay-btn" id="confirmPayBtn">Confirm & Pay via WhatsApp</button>
   <button class="pay-btn" id="backBtn" style="background:#ccc;color:#111;margin-top:6px;">Back</button>
 </div>
   </div>
@@ -622,7 +632,7 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
         </ul>
       </div>
 
-      <div class="footer-column">
+     <!-- <div class="footer-column">
         <h4>Customer Care</h4>
         <ul>
           <li><a href="#contact">Contact Us</a></li>
@@ -631,7 +641,7 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
           <li><a href="#size-guide">Fragrance Guide</a></li>
           <li><a href="#faq">FAQ</a></li>
         </ul>
-      </div>
+      </div> 
 
       <div class="footer-column">
         <h4>Company</h4>
@@ -642,23 +652,25 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
           <li><a href="#press">Press</a></li>
           <li><a href="#wholesale">Wholesale</a></li>
         </ul>
-      </div>
+      </div> -->
 
       <div class="footer-column">
         <h4>Connect</h4>
         <div class="social-links">
-          <a href="#" class="social-link"><span>📘</span> Facebook</a>
-          <a href="#" class="social-link"><span>📷</span> Instagram</a>
-    <!-- <a href="#" class="social-link"><span>🐦</span> Twitter</a>
-          <a href="#" class="social-link"><span>📌</span> Pinterest</a>
-          <a href="#" class="social-link"><span>📱</span> TikTok</a> -->
-        </div>
+  <a href="#" class="social-link"><i class="fab fa-facebook-f"></i> Facebook</a>
+  <a href="#" class="social-link"><i class="fab fa-instagram"></i> Instagram</a>
+  <a href="#" class="social-link"><i class="fab fa-x-twitter"></i> Twitter</a>
+  <a href="#" class="social-link"><i class="fab fa-pinterest-p"></i> Pinterest</a>
+  <a href="#" class="social-link"><i class="fab fa-tiktok"></i> TikTok</a>
+</div>
+
         <div class="contact-info">
-          <h4>Customer Service</h4>
-          <p>📞 +91 99675 89330</p>
-          <p>✉️ hello@alabwaperfumes.com</p>
-          <p>🕒 Mon-Fri: 9AM-6PM IST</p>
-        </div>
+  <p><strong>Customer Service</strong></p>
+  <p><i class="fas fa-phone"></i> +91 99675 89330</p>
+  <p><i class="fas fa-envelope"></i> hello@alabwaperfumes.com</p>
+  <p><i class="fas fa-clock"></i> Mon–Fri: 9AM–6PM IST</p>
+</div>
+
       </div>
     </div>
   </div>
@@ -667,7 +679,7 @@ footer{background:#111;color:#eee;text-align:center;padding:40px 16px;margin-top
   <div class="footer-bottom">
     <div class="footer-bottom-content">
       <div class="footer-legal">
-        <p><b>&copy; 2025 Fawaz Fragrence. All rights reserved. Crafted by Eaz Nexora</b></p>
+        <p>&copy; 2025 Fawaz Fragrence. All rights reserved. Crafted by Eaz Nexora</p>
         <div class="legal-links">
           <a href="#privacy">Privacy Policy</a>
           <a href="#terms">Terms of Service</a>
@@ -846,7 +858,17 @@ function goToDetails(img) {
       }
     }
 
+     if (stickyCheckout){
+    if (cart.length > 0 && total > 0){
+      stickyCheckout.textContent = `Checkout (₹${total})`;
+      // visibility will be decided by handleStickyCheckoutVisibility
+    } else {
+      stickyCheckout.style.display = 'none';
+    }
+   }
+
     saveCart();
+
   }
 
   function changeQty(idx, delta){
@@ -1125,21 +1147,36 @@ window.addEventListener('resize', handleStickyCheckoutVisibility);
   }
 
   // ========== CART FUNCTIONS ==========
-  function openCart() {
-    if (cartPanel) {
-      cartPanel.classList.add('open');
-      cartPanel.setAttribute('aria-hidden','false');
-      if (cartForm) cartForm.style.display = 'none';
-    }
-  }
+ function openCart() {
+  if (cartPanel) {
+    cartPanel.classList.add('open');
+    cartPanel.setAttribute('aria-hidden', 'false');
+    if (cartForm) cartForm.style.display = 'none';
 
-  function closeCartPanel() {
-    if (cartPanel) {
-      cartPanel.classList.remove('open');
-      cartPanel.setAttribute('aria-hidden','true');
-      if (cartForm) cartForm.style.display = 'none';
+    // 🔥 Hide sticky checkout when cart is open
+    const stickyCheckout = document.getElementById('stickyCheckout');
+    if (stickyCheckout) {
+      stickyCheckout.style.display = 'none';
     }
   }
+}
+
+function closeCartPanel() {
+  if (cartPanel) {
+    cartPanel.classList.remove('open');
+    cartPanel.setAttribute('aria-hidden', 'true');
+    if (cartForm) cartForm.style.display = 'none';
+
+    // 🔥 Show sticky checkout again if cart has items
+    const stickyCheckout = document.getElementById('stickyCheckout');
+    if (stickyCheckout && cart.length > 0) {
+      stickyCheckout.style.display = 'block';
+    } else if (stickyCheckout) {
+      stickyCheckout.style.display = 'none';
+    }
+  }
+}
+
 
 function handleWhatsAppCheckout() {
   const name = (qs('#customerName') || {}).value || '';
